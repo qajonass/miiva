@@ -2,38 +2,31 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>IVA 21%</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+<title>MiIVA</title>
 
 <style>
-*{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
-    font-family:Arial,sans-serif;
-}
-
 body{
-    background:#f5f5f5;
-    min-height:100vh;
-    display:flex;
-    flex-direction:column;
+    margin:0;
     padding:15px;
+    font-family:Arial,sans-serif;
+    background:#f5f5f5;
 }
 
 h1{
     text-align:center;
-    margin-bottom:15px;
+    margin:10px 0 20px;
+    font-size:40px;
 }
 
 #total{
     width:100%;
-    font-size:42px;
+    font-size:48px;
     text-align:center;
-    padding:15px;
+    padding:20px;
     border:2px solid #ccc;
     border-radius:12px;
-    background:white;
 }
 
 #resultado{
@@ -44,82 +37,62 @@ h1{
     text-align:center;
 }
 
-.valor{
-    font-size:34px;
-    font-weight:bold;
-    margin:10px 0;
-}
-
 .etiqueta{
+    font-size:20px;
     color:#666;
-    font-size:18px;
 }
 
-#reemplazar{
-    width:100%;
-    margin-top:15px;
-    padding:15px;
-    font-size:22px;
-    border:none;
-    border-radius:12px;
-    background:#1976d2;
-    color:white;
-}
-
-#reemplazar:active{
-    transform:scale(0.98);
+.valor{
+    font-size:42px;
+    font-weight:bold;
+    margin:10px 0 25px;
 }
 </style>
 </head>
 
 <body>
 
-<h1>IVA 21%</h1>
+<h1>MiIVA</h1>
 
 <input
     id="total"
     type="text"
     inputmode="decimal"
-    placeholder="Ingrese monto"
-    onclick="seleccionarTodo()"
-    onfocus="seleccionarTodo()"
+    enterkeyhint="done"
+    autocomplete="off"
+    spellcheck="false"
 >
 
-<button id="reemplazar" onclick="seleccionarTodo()">
-    Reemplazar monto
-</button>
-
 <div id="resultado">
-    <div class="etiqueta">Neto</div>
+
+    <div class="etiqueta">NETO</div>
     <div class="valor" id="neto">0.000</div>
 
     <div class="etiqueta">IVA</div>
     <div class="valor" id="iva">0.000</div>
+
 </div>
 
 <script>
-const total = document.getElementById("total");
 
-function seleccionarTodo(){
-    total.focus();
-    total.select();
-}
+const campo = document.getElementById("total");
 
 function calcular(){
-    let valor = total.value.replace(",", ".");
 
-    if(valor === ""){
-        document.getElementById("neto").textContent = "0.000";
-        document.getElementById("iva").textContent = "0.000";
+    let texto = campo.value.replace(",", ".");
+
+    if(!texto){
+        document.getElementById("neto").textContent="0.000";
+        document.getElementById("iva").textContent="0.000";
         return;
     }
 
-    let monto = parseFloat(valor);
+    let total = parseFloat(texto);
 
-    if(isNaN(monto)) return;
+    if(isNaN(total)) return;
 
-    let neto = monto / 1.21;
-    let iva = monto - neto;
+    let neto = total / 1.21;
+    let iva = total - neto;
 
     document.getElementById("neto").textContent =
         neto.toFixed(3);
@@ -128,10 +101,29 @@ function calcular(){
         iva.toFixed(3);
 }
 
-total.addEventListener("input", calcular);
+campo.addEventListener("input", calcular);
+
+campo.addEventListener("keydown", function(e){
+
+    if(e.key === "Enter"){
+
+        e.preventDefault();
+
+        this.focus();
+
+        setTimeout(()=>{
+            this.select();
+        },50);
+    }
+});
 
 window.onload = () => {
-    total.focus();
+
+    campo.focus();
+
+    setTimeout(()=>{
+        campo.focus();
+    },500);
 };
 </script>
 
