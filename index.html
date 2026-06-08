@@ -3,43 +3,167 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#121212">
 <title>IVA Facturación</title>
-<link rel="manifest" href="manifest.json">
+
 <style>
-body{background:#121212;color:white;font-family:Arial,sans-serif;text-align:center;padding:15px}
-input,select,button{font-size:1.4rem;padding:12px;margin:8px;width:95%}
-.valor{font-size:2.2rem;font-weight:bold;margin:15px 0}
+body{
+    margin:0;
+    background:#111;
+    color:white;
+    font-family:Arial,sans-serif;
+    text-align:center;
+    padding:10px;
+}
+
+select{
+    width:95%;
+    font-size:28px;
+    padding:10px;
+    margin-bottom:15px;
+}
+
+#pantalla{
+    font-size:48px;
+    font-weight:bold;
+    margin:15px 0;
+    min-height:60px;
+}
+
+.titulo{
+    color:#aaa;
+    font-size:22px;
+}
+
+.resultado{
+    font-size:52px;
+    font-weight:bold;
+    margin-bottom:20px;
+}
+
+.teclado{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+    margin-top:15px;
+}
+
+button{
+    font-size:34px;
+    padding:18px;
+    border:none;
+    border-radius:8px;
+}
+
+.accion{
+    width:100%;
+    margin-top:10px;
+    font-size:26px;
+}
 </style>
 </head>
+
 <body>
-<h2>Calculadora IVA</h2>
-<select id="tasa">
-<option value="1.21">IVA 21%</option>
-<option value="1.105">IVA 10,5%</option>
+
+<select id="ivaTipo" onchange="calcular()">
+    <option value="1.21">IVA 21%</option>
+    <option value="1.105">IVA 10,5%</option>
 </select>
-<input id="total" type="number" step="0.001" placeholder="Total con IVA">
-<div>Neto</div><div class="valor" id="neto">0.000</div>
-<div>IVA</div><div class="valor" id="iva">0.000</div>
-<button onclick="copiar('neto')">Copiar Neto</button>
-<button onclick="copiar('iva')">Copiar IVA</button>
-<button onclick="nuevo()">Siguiente factura</button>
+
+<div id="pantalla">0.000</div>
+
+<div class="titulo">NETO</div>
+<div id="neto" class="resultado">0.000</div>
+
+<div class="titulo">IVA</div>
+<div id="iva" class="resultado">0.000</div>
+
+<div class="teclado">
+    <button onclick="agregar('7')">7</button>
+    <button onclick="agregar('8')">8</button>
+    <button onclick="agregar('9')">9</button>
+
+    <button onclick="agregar('4')">4</button>
+    <button onclick="agregar('5')">5</button>
+    <button onclick="agregar('6')">6</button>
+
+    <button onclick="agregar('1')">1</button>
+    <button onclick="agregar('2')">2</button>
+    <button onclick="agregar('3')">3</button>
+
+    <button onclick="agregar('0')">0</button>
+    <button onclick="agregar('.')">.</button>
+    <button onclick="borrar()">⌫</button>
+</div>
+
+<button class="accion" onclick="limpiar()">C</button>
+<button class="accion" onclick="siguienteFactura()">SIGUIENTE FACTURA</button>
+
 <script>
-const total=document.getElementById('total');
-const tasa=document.getElementById('tasa');
-function calc(){
- let v=parseFloat(total.value);
- if(isNaN(v)){neto.textContent='0.000';iva.textContent='0.000';return;}
- let n=v/parseFloat(tasa.value);
- let i=v-n;
- neto.textContent=n.toFixed(3);
- iva.textContent=i.toFixed(3);
+let valor="";
+let reemplazar=false;
+
+function agregar(num){
+
+    if(reemplazar){
+        valor="";
+        reemplazar=false;
+    }
+
+    if(num==="." && valor.includes(".")) return;
+
+    valor+=num;
+
+    mostrar();
 }
-function copiar(id){navigator.clipboard.writeText(document.getElementById(id).textContent);}
-function nuevo(){total.value='';calc();total.focus();}
-total.addEventListener('input',calc);
-tasa.addEventListener('change',calc);
-if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js');}
+
+function borrar(){
+    valor=valor.slice(0,-1);
+    mostrar();
+}
+
+function limpiar(){
+    valor="";
+    mostrar();
+}
+
+function siguienteFactura(){
+    valor="";
+    mostrar();
+}
+
+function mostrar(){
+
+    let total=parseFloat(valor);
+
+    document.getElementById("pantalla").innerHTML =
+        valor || "0.000";
+
+    if(isNaN(total)){
+        document.getElementById("neto").innerHTML="0.000";
+        document.getElementById("iva").innerHTML="0.000";
+        return;
+    }
+
+    let divisor=parseFloat(
+        document.getElementById("ivaTipo").value
+    );
+
+    let neto=total/divisor;
+    let iva=total-neto;
+
+    document.getElementById("neto").innerHTML=
+        neto.toFixed(3);
+
+    document.getElementById("iva").innerHTML=
+        iva.toFixed(3);
+
+    reemplazar=true;
+}
+
+function calcular(){
+    mostrar();
+}
 </script>
+
 </body>
 </html>
