@@ -2,123 +2,137 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IVA Facturación</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>IVA 21%</title>
 
 <style>
-body{
-    background:#111;
-    color:white;
-    font-family:Arial,sans-serif;
-    text-align:center;
+*{
+    box-sizing:border-box;
     margin:0;
-    padding:20px;
+    padding:0;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    background:#f5f5f5;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    padding:15px;
 }
 
 h1{
-    margin-top:10px;
-    font-size:2rem;
-}
-
-select{
-    width:95%;
-    max-width:500px;
-    padding:15px;
-    font-size:1.4rem;
-    margin-bottom:20px;
-}
-
-input{
-    width:95%;
-    max-width:500px;
-    padding:20px;
-    font-size:2.5rem;
     text-align:center;
-    border:none;
-    border-radius:10px;
-    margin-bottom:25px;
+    margin-bottom:15px;
 }
 
-.titulo{
-    color:#aaa;
-    font-size:1.2rem;
-    margin-top:10px;
+#total{
+    width:100%;
+    font-size:42px;
+    text-align:center;
+    padding:15px;
+    border:2px solid #ccc;
+    border-radius:12px;
+    background:white;
 }
 
-.resultado{
-    font-size:3rem;
+#resultado{
+    margin-top:20px;
+    background:white;
+    border-radius:12px;
+    padding:20px;
+    text-align:center;
+}
+
+.valor{
+    font-size:34px;
     font-weight:bold;
-    margin-bottom:25px;
+    margin:10px 0;
+}
+
+.etiqueta{
+    color:#666;
+    font-size:18px;
+}
+
+#reemplazar{
+    width:100%;
+    margin-top:15px;
+    padding:15px;
+    font-size:22px;
+    border:none;
+    border-radius:12px;
+    background:#1976d2;
+    color:white;
+}
+
+#reemplazar:active{
+    transform:scale(0.98);
 }
 </style>
 </head>
 
 <body>
 
-<h1>IVA FACTURACIÓN</h1>
-
-<select id="ivaTipo">
-    <option value="1.21" selected>IVA 21%</option>
-    <option value="1.105">IVA 10,5%</option>
-</select>
+<h1>IVA 21%</h1>
 
 <input
     id="total"
-    type="number"
-    step="0.001"
-    placeholder="0.000"
-    autofocus
+    type="text"
+    inputmode="decimal"
+    placeholder="Ingrese monto"
+    onclick="seleccionarTodo()"
+    onfocus="seleccionarTodo()"
 >
 
-<div class="titulo">NETO</div>
-<div id="neto" class="resultado">0.000</div>
+<button id="reemplazar" onclick="seleccionarTodo()">
+    Reemplazar monto
+</button>
 
-<div class="titulo">IVA</div>
-<div id="iva" class="resultado">0.000</div>
+<div id="resultado">
+    <div class="etiqueta">Neto</div>
+    <div class="valor" id="neto">0.000</div>
+
+    <div class="etiqueta">IVA</div>
+    <div class="valor" id="iva">0.000</div>
+</div>
 
 <script>
-
 const total = document.getElementById("total");
-const ivaTipo = document.getElementById("ivaTipo");
-const neto = document.getElementById("neto");
-const iva = document.getElementById("iva");
+
+function seleccionarTodo(){
+    total.focus();
+    total.select();
+}
 
 function calcular(){
+    let valor = total.value.replace(",", ".");
 
-    let valor = parseFloat(
-        total.value.replace(",", ".")
-    );
-
-    if(isNaN(valor)){
-        neto.textContent = "0.000";
-        iva.textContent = "0.000";
+    if(valor === ""){
+        document.getElementById("neto").textContent = "0.000";
+        document.getElementById("iva").textContent = "0.000";
         return;
     }
 
-    let divisor = parseFloat(ivaTipo.value);
+    let monto = parseFloat(valor);
 
-    let netoCalc = valor / divisor;
-    let ivaCalc = valor - netoCalc;
+    if(isNaN(monto)) return;
 
-    neto.textContent = netoCalc.toFixed(3);
-    iva.textContent = ivaCalc.toFixed(3);
+    let neto = monto / 1.21;
+    let iva = monto - neto;
+
+    document.getElementById("neto").textContent =
+        neto.toFixed(3);
+
+    document.getElementById("iva").textContent =
+        iva.toFixed(3);
 }
 
 total.addEventListener("input", calcular);
-ivaTipo.addEventListener("change", calcular);
 
-total.addEventListener("focus", function(){
-    this.select();
-});
-
-total.addEventListener("click", function(){
-    this.select();
-});
-
-window.onload = function(){
+window.onload = () => {
     total.focus();
 };
-
 </script>
 
 </body>
