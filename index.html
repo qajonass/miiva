@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#121212">
+<title>IVA Facturación</title>
+<link rel="manifest" href="manifest.json">
+<style>
+body{background:#121212;color:white;font-family:Arial,sans-serif;text-align:center;padding:15px}
+input,select,button{font-size:1.4rem;padding:12px;margin:8px;width:95%}
+.valor{font-size:2.2rem;font-weight:bold;margin:15px 0}
+</style>
+</head>
+<body>
+<h2>Calculadora IVA</h2>
+<select id="tasa">
+<option value="1.21">IVA 21%</option>
+<option value="1.105">IVA 10,5%</option>
+</select>
+<input id="total" type="number" step="0.001" placeholder="Total con IVA">
+<div>Neto</div><div class="valor" id="neto">0.000</div>
+<div>IVA</div><div class="valor" id="iva">0.000</div>
+<button onclick="copiar('neto')">Copiar Neto</button>
+<button onclick="copiar('iva')">Copiar IVA</button>
+<button onclick="nuevo()">Siguiente factura</button>
+<script>
+const total=document.getElementById('total');
+const tasa=document.getElementById('tasa');
+function calc(){
+ let v=parseFloat(total.value);
+ if(isNaN(v)){neto.textContent='0.000';iva.textContent='0.000';return;}
+ let n=v/parseFloat(tasa.value);
+ let i=v-n;
+ neto.textContent=n.toFixed(3);
+ iva.textContent=i.toFixed(3);
+}
+function copiar(id){navigator.clipboard.writeText(document.getElementById(id).textContent);}
+function nuevo(){total.value='';calc();total.focus();}
+total.addEventListener('input',calc);
+tasa.addEventListener('change',calc);
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js');}
+</script>
+</body>
+</html>
