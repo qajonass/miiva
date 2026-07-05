@@ -1,85 +1,6 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-
-<title>MiIVA</title>
-
-<style>
-body{
-    margin:0;
-    padding:15px;
-    font-family:Arial,sans-serif;
-    background:#f5f5f5;
-}
-
-h1{
-    text-align:center;
-    margin:10px 0 20px;
-    font-size:40px;
-}
-
-#total{
-    width:100%;
-    font-size:48px;
-    text-align:center;
-    padding:20px;
-    border:2px solid #ccc;
-    border-radius:12px;
-}
-
-#resultado{
-    margin-top:20px;
-    background:white;
-    border-radius:12px;
-    padding:20px;
-    text-align:center;
-}
-
-.etiqueta{
-    font-size:20px;
-    color:#666;
-}
-
-.valor{
-    font-size:42px;
-    font-weight:bold;
-    margin:10px 0 25px;
-}
-</style>
-</head>
-
-<body>
-
-<h1>MiIVA</h1>
-
-<input
-    id="total"
-    type="text"
-    inputmode="decimal"
-    enterkeyhint="done"
-    autocomplete="off"
-    spellcheck="false"
->
-
-<div id="resultado">
-
-    <div class="etiqueta">NETO</div>
-    <div class="valor" id="neto">0.000</div>
-
-    <div class="etiqueta">IVA</div>
-    <div class="valor" id="iva">0.000</div>
-
-</div>
-
-<script>
-
-const campo = document.getElementById("total");
-
 function calcular(){
 
-    let texto = campo.value.replace(",", ".");
+    let texto = campo.value.trim();
 
     if(!texto){
         document.getElementById("neto").textContent="0.000";
@@ -87,9 +8,24 @@ function calcular(){
         return;
     }
 
-    let total = parseFloat(texto);
+    // Permite usar coma como decimal
+    texto = texto.replace(/,/g,".");
 
-    if(isNaN(total)) return;
+    // Solo permite números y operadores
+    if(!/^[0-9+\-*/(). ]+$/.test(texto)){
+        return;
+    }
+
+    let total;
+
+    try{
+        total = Function('"use strict"; return (' + texto + ')')();
+    }catch{
+        return;
+    }
+
+    if(isNaN(total) || !isFinite(total))
+        return;
 
     let neto = total / 1.21;
     let iva = total - neto;
@@ -100,32 +36,3 @@ function calcular(){
     document.getElementById("iva").textContent =
         iva.toFixed(3);
 }
-
-campo.addEventListener("input", calcular);
-
-campo.addEventListener("keydown", function(e){
-
-    if(e.key === "Enter"){
-
-        e.preventDefault();
-
-        this.focus();
-
-        setTimeout(()=>{
-            this.select();
-        },50);
-    }
-});
-
-window.onload = () => {
-
-    campo.focus();
-
-    setTimeout(()=>{
-        campo.focus();
-    },500);
-};
-</script>
-
-</body>
-</html>
