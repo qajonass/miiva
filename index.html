@@ -79,28 +79,61 @@ const campo = document.getElementById("total");
 
 function calcular(){
 
-    let texto = campo.value.replace(",", ".");
+    let texto = campo.value.trim().replace(",", ".");
 
-    if(!texto){
-        document.getElementById("neto").textContent="0.000";
-        document.getElementById("iva").textContent="0.000";
+    if(texto === ""){
+        document.getElementById("neto").textContent = "0.000";
+        document.getElementById("iva").textContent = "0.000";
         return;
     }
 
-    let total = parseFloat(texto);
+    let total;
+
+    // ¿Hay una operación?
+    if(texto.includes("/") || texto.includes("*") || texto.includes("+") || texto.includes("-")){
+
+        const partes = texto.match(/^(\d+(?:\.\d+)?)([+\-*/])(\d+(?:\.\d+)?)$/);
+
+        if(!partes) return;
+
+        const a = parseFloat(partes[1]);
+        const op = partes[2];
+        const b = parseFloat(partes[3]);
+
+        switch(op){
+            case "+":
+                total = a + b;
+                break;
+
+            case "-":
+                total = a - b;
+                break;
+
+            case "*":
+                total = a * b;
+                break;
+
+            case "/":
+                if(b === 0) return;
+                total = a / b;
+                break;
+        }
+
+    }else{
+
+        total = parseFloat(texto);
+
+    }
 
     if(isNaN(total)) return;
 
-    let neto = total / 1.21;
-    let iva = total - neto;
+    const neto = total / 1.21;
+    const iva = total - neto;
 
-    document.getElementById("neto").textContent =
-        neto.toFixed(3);
+    document.getElementById("neto").textContent = neto.toFixed(3);
+    document.getElementById("iva").textContent = iva.toFixed(3);
 
-    document.getElementById("iva").textContent =
-        iva.toFixed(3);
 }
-
 campo.addEventListener("input", calcular);
 
 campo.addEventListener("keydown", function(e){
