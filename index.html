@@ -2,82 +2,130 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Calculadora IVA 21%</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+<title>MiIVA</title>
+
 <style>
 body{
-    font-family: Arial, sans-serif;
-    text-align:center;
-    padding:20px;
+    margin:0;
+    padding:15px;
+    font-family:Arial,sans-serif;
     background:#f5f5f5;
 }
-input{
-    width:90%;
-    max-width:300px;
-    font-size:32px;
-    padding:10px;
+
+h1{
     text-align:center;
-    display: block;
-    margin: 0 auto 15px auto;
+    margin:10px 0 20px;
+    font-size:40px;
 }
-.btn-borrar {
-    width: 90%;
-    max-width: 320px;
-    font-size: 24px;
-    padding: 15px;
-    background-color: #ff4d4d;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-    display: block;
-    margin: 0 auto 20px auto;
+
+#total{
+    width:100%;
+    font-size:48px;
+    text-align:center;
+    padding:20px;
+    border:2px solid #ccc;
+    border-radius:12px;
 }
-.resultado{
+
+#resultado{
     margin-top:20px;
-    font-size:28px;
+    background:white;
+    border-radius:12px;
+    padding:20px;
+    text-align:center;
+}
+
+.etiqueta{
+    font-size:20px;
+    color:#666;
+}
+
+.valor{
+    font-size:42px;
+    font-weight:bold;
+    margin:10px 0 25px;
 }
 </style>
 </head>
+
 <body>
 
-<h2>IVA 21%</h2>
+<h1>MiIVA</h1>
 
-<input type="number" id="monto" step="0.001" placeholder="Ingrese monto">
+<input
+    id="total"
+    type="text"
+    inputmode="decimal"
+    enterkeyhint="done"
+    autocomplete="off"
+    spellcheck="false"
+>
 
-<button class="btn-borrar" id="btnBorrar">Borrar Monto</button>
+<div id="resultado">
 
-<div class="resultado">
-    <p>IVA: $<span id="iva">0.000</span></p>
-    <p>Sin IVA: $<span id="siniva">0.000</span></p>
+    <div class="etiqueta">NETO</div>
+    <div class="valor" id="neto">0.000</div>
+
+    <div class="etiqueta">IVA</div>
+    <div class="valor" id="iva">0.000</div>
+
 </div>
 
 <script>
-const monto = document.getElementById('monto');
-const btnBorrar = document.getElementById('btnBorrar');
 
-function calcular() {
-    let total = parseFloat(monto.value);
-    if (isNaN(total)) {
-        document.getElementById('iva').textContent = '0.000';
-        document.getElementById('siniva').textContent = '0.000';
+const campo = document.getElementById("total");
+
+function calcular(){
+
+    let texto = campo.value.replace(",", ".");
+
+    if(!texto){
+        document.getElementById("neto").textContent="0.000";
+        document.getElementById("iva").textContent="0.000";
         return;
     }
-    let base = total / 1.21;
-    let iva = total - base;
-    document.getElementById('iva').textContent = iva.toFixed(3);
-    document.getElementById('siniva').textContent = base.toFixed(3);
+
+    let total = parseFloat(texto);
+
+    if(isNaN(total)) return;
+
+    let neto = total / 1.21;
+    let iva = total - neto;
+
+    document.getElementById("neto").textContent =
+        neto.toFixed(3);
+
+    document.getElementById("iva").textContent =
+        iva.toFixed(3);
 }
 
-monto.addEventListener('input', calcular);
-btnBorrar.addEventListener('click', function() {
-    monto.value = '';
-    calcular();
-    monto.focus();
+campo.addEventListener("input", calcular);
+
+campo.addEventListener("keydown", function(e){
+
+    if(e.key === "Enter"){
+
+        e.preventDefault();
+
+        this.focus();
+
+        setTimeout(()=>{
+            this.select();
+        },50);
+    }
 });
+
+window.onload = () => {
+
+    campo.focus();
+
+    setTimeout(()=>{
+        campo.focus();
+    },500);
+};
 </script>
 
 </body>
 </html>
-
